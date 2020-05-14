@@ -1,0 +1,15 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+Stage: build
+
+%environment
+    PATH=/opt/conda/envs/kch/bin:$PATH
+
+%post
+    /opt/conda/bin/conda install -y python=3.8
+    python -V
+    /opt/conda/bin/conda install -y pandas numpy scikit-learn scipy
+    /opt/conda/bin/conda install -c conda-forge xgboost
+
+%runscript
+    exec "$@"
