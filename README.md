@@ -98,7 +98,7 @@ simulated dataset:
 
 ```bash
 git clone https://github.com/ewancarr/NEWS2-COVID-19
-conda env create -f conda.yml
+conda env create -f software/conda.yml
 conda activate base
 python replicate.py
 ```
