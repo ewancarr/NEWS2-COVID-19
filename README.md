@@ -9,7 +9,8 @@ paper](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2).
 
 # Data cleaning
 
-The `replicate.py` script requires a dataset with the following columns:
+The `replicate.py` script requires a dataset with (at least some of ) the
+following columns:
 
 |                          | Column              | Measure                                       | Transformation |
 |--------------------------|---------------------|-----------------------------------------------|----------------|
@@ -38,7 +39,22 @@ The `replicate.py` script requires a dataset with the following columns:
 |                          | `dbp`               | Diastolic blood pressure                      | None           |
 |                          | `gcs_score`         | Glasgow Coma Scale total score                | None           |
 
-# Data cleaning
+Not all columns are required for replication. At a minimum, you need: `y`,
+`age`, `news2`, `crp_sqrt`, `neutrophils`, `estimatedgfr`, and `albumin`. This
+would allow validation of the supplemented NEWS2 score model from the paper
+(i.e. Models 1 and 5 from Table 3, p. 19).
 
+## Definitions
+
+Please see `cleaning.R` for details how variables were derived.
+
+* `y` is a binary variable indicating transfer to ICU/death (WHO-COVID-19
+  Outcomes Scales 6-8) within 14 days of sympton onset.
+    * All patients must have reached their 14-day endpoint (post-onset).
+    * Patients who experienced the outcome (ICU/death) within the time period
+      are scored 1; all other patients are scored 0.
+* All parameters are measured at the first available occassion post-admission
+  to hospital. For most patients this is within the first 36 hours of
+  admission.
 
 
