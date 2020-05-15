@@ -62,7 +62,7 @@ scoring = {'tp': make_scorer(tp),
            'recall': make_scorer(recall_score)}
 
 # Load validation sample ------------------------------------------------------
-validation = pd.read_csv('validation.csv')
+validation = pd.read_csv('simulated.csv')
 if 'y' not in list(validation):
     raise ValueError('Dataset must contain binary outcome (y)')
 
