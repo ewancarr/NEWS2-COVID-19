@@ -8,7 +8,7 @@ Stage: build
 %post
     /opt/conda/bin/conda install -y python=3.8
     python -V
-    /opt/conda/bin/conda install -y pandas numpy scikit-learn scipy
+    /opt/conda/bin/conda install -y pandas numpy scikit-learn scipy ipython
     /opt/conda/bin/conda install -c conda-forge xgboost
 
 %runscript
