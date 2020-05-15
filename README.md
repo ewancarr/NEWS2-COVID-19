@@ -1,6 +1,11 @@
 # Supplementing the National Early Warning Score (NEWS2) for anticipating early deterioration among patients with COVID-19 infection
 
-<https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2>
+Ewan Carr<sup>\*</sup>, Rebecca Bendayan<sup>\*</sup>, Daniel Bean, Kevin O'Gallagher, Andrew Pickles,
+Daniel Stahl, Rosita Zakeri, Thomas Searle, Anthony Shek, Zeljko Kraljevic,
+James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard Dobson<sup>\#</sup>
+doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
+
+<sup>\*\#</sup>Joint authors
 
 # Overview
 
