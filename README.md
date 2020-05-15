@@ -61,7 +61,7 @@ pre-trained models. Specifically, it:
 All models are written in Python using
 [scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages is
 required (`pandas`, `numpy`, `scikit-learn`; see
-[`requirements.txt`][software/requirments.txt].
+[`requirements.txt`](software/requirments.txt).
 
 Some notes:
 
