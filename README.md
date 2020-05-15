@@ -63,11 +63,6 @@ pre-trained models. Specifically, it:
 2. For each feature set, it loads a pre-trained model (see
    [here][training/trained_models]) and tests this on the new data.
 
-All models are written in Python using
-[scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages is
-required (`pandas`, `numpy`, `scikit-learn`; see
-[`requirements.txt`](software/requirments.txt)).
-
 Some notes:
 
 * The code does not perform any training or cross-validation, with the
@@ -76,6 +71,25 @@ Some notes:
   is quite specific to the structure of the source data. It should demonstrate
   how we prepared the training and validation datasets, but will likely require
   modification before running on replication samples.
+
+## Setup
+
+* All models are written in Python using
+  [scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages
+  is required (`pandas`, `numpy`, `scikit-learn`; see
+  [`requirements.txt`](software/requirments.txt)).
+* The recommended way to use this repo is in a virtual environment. If you’re
+  using `conda`, you can use:
+
+  ```{bash}
+  conda env create -f conda.yml
+  ```
+* If your using Singularity, you can use:
+
+  ```{bash}
+  singularity build python.simg singularity.def
+  ```
+See `conda.yml` and `singularity.def` in the [`software`](software) folder.
 
 ## Cohort selection
 
