@@ -12,7 +12,6 @@ doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 This repository provides pre-trained models to validate models in the [medRxiv
 paper](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2). 
 
-
 # Methods
 
 # Required measures
@@ -58,8 +57,7 @@ paper](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2).
 The file [`replicate.py`](replicate.py) will fit a series of models using
 pre-trained models. Specifically, it:
 
-1. Imports a CSV file containing the required features and outcome
-   (`validation.csv`).
+1. Imports a CSV file containing the required features and outcome.
 2. For each feature set, it loads a pre-trained model (see
    [here][training/trained_models]) and tests this on the new data.
 
@@ -90,6 +88,20 @@ Some notes:
   singularity build python.simg singularity.def
   ```
 See `conda.yml` and `singularity.def` in the [`software`](software) folder.
+
+## Simulated data
+
+We have provided some simulated data for testing purposes
+([`simulated.csv`](simulated.csv)). This is randomly generated data based on
+the means/SD of the training sample. For example, you can fit all models to the
+simulated dataset:
+
+```bash
+git clone https://github.com/ewancarr/NEWS2-COVID-19
+conda env create -f conda.yml
+conda activate base
+python replicate.py
+```
 
 ## Cohort selection
 
