@@ -50,7 +50,7 @@ paper](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2).
 
 # How to use this repository
 
-The file [`replicate.py`][replicate.py] will fit a series of models using
+The file [`replicate.py`](replicate.py) will fit a series of models using
 pre-trained models. Specifically, it:
 
 1. Imports a CSV file containing the required features and outcome
@@ -61,7 +61,7 @@ pre-trained models. Specifically, it:
 All models are written in Python using
 [scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages is
 required (`pandas`, `numpy`, `scikit-learn`; see
-[`requirements.txt`](software/requirments.txt).
+[`requirements.txt`](software/requirments.txt)).
 
 Some notes:
 
@@ -105,7 +105,7 @@ If date of symptom onset is unavailable it may be necessary to impute or use
 date of hospital admission. Most endpoints happen at 10-14 days, so you may
 have to work out how to define this.
 
-## Features
+## Feature sets
 
 Please refer to the [above](#required-measures) table for details of the
 required measures. The aim of this analysis is to assess the improvement in
@@ -134,3 +134,46 @@ All features must be measured at or shortly after hospital admission (within
   the fitted object contains data that cannot be shared publicly.  
 * Therefore, [`replicate.py`](replicate.py) will train the KNN imputation on
   the provided validation dataset (see [here](replicate.py#L109-L110)).
+
+# 
+
+# Descriptors of your cohort to allow comment about how different your cohort is from ours
+
+|                                | N     | All patients      | No ICU/death<br> (n=393) | ICU/death<br> (n=159) |
+|--------------------------------|-------|-------------------|--------------------------|-----------------------|
+| Age                            | 452   | 67.00 [28.00]     | 64.87 [30.00]            | 70.92 [27.00]         |
+| Sex (male) N (%)               | 452   | 248 (54.9%)       | 157 (53.6%)              | 91 (57.2%)            |
+| Ethnicity - BAME N (%)         | 285   | 120 (42.1%)       | 73 (41.0%)               | 47 (43.9%)            |
+| **Comorbidities**              | **N** |                   | **N (%)**                |                       |
+| Hypertension                   | 452   | 243 (53.8%)       | 147 (50.2%)              | 96 (60.4%)            |
+| Diabetes mellitus              | 452   | 154 (34.1%)       | 93 (31.7%)               | 61 (38.4%)            |
+| Heart Failure                  | 452   | 57 (12.6%)        | 32 (10.9%)               | 25 (15.7%)            |
+| Ischaemic Heart Diseases       | 452   | 85 (18.8%)        | 55 (18.8%)               | 30 (18.9%)            |
+| COPD                           | 452   | 48 (10.6%)        | 27 (9.2%)                | 21 (13.2%)            |
+| Asthma                         | 452   | 65 (14.4%)        | 44 (15.0%)               | 21 (13.2%)            |
+| Chronic Kidney Disease         | 452   | 84 (18.6%)        | 46 (15.7%)               | 38 (23.9%)            |
+| **Blood biomarkers**           | **N** |                   | **Mean [IQR]**           |                       |
+| Albumin                        | 322   | 37.11 [7.00]      | 38.05 [7.00]             | 35.48 [7.00]          |
+| Alanine aminotransferase (ALT) | 184   | 54.83 [33.00]     | 60.34 [30.50]            | 46.45 [34.00]         |
+| C-reactive protein (CRP)       | 419   | 93.55 [106.70]    | 72.99 [84.90]            | 130.41 [135.62]       |
+| Creatinine                     | 420   | 121.67 [49.00]    | 105.86 [40.50]           | 150.42 [72.00]        |
+| Estimated GFR                  | 334   | 63.75 [40.00]     | 68.01 [36.00]            | 56.05 [44.50]         |
+| Ferritin                       | 122   | 1356.01 [1165.25] | 1272.35 [1149.75]        | 1442.45 [902.50]      |
+| Haemoglobin                    | 419   | 125.05 [30.00]    | 125.52 [30.00]           | 124.21 [28.75]        |
+| Lymphocyte count               | 419   | 1.45 [0.67]       | 1.10 [0.69]              | 2.09 [0.67]           |
+| Neutrophil count               | 418   | 5.72 [3.53]       | 5.06 [3.01]              | 6.91 [5.31]           |
+| Neutrophil/lymphocyte ratio    | 418   | 6.80 [5.01]       | 5.81 [4.22]              | 8.58 [6.26]           |
+| Lymphocyte/CRP ratio           | 416   | 0.07 [0.04]       | 0.08 [0.05]              | 0.05 [0.02]           |
+| Platelet count                 | 421   | 226.68 [103.00]   | 228.34 [102.50]          | 223.69 [104.25]       |
+| Troponin T                     | 141   | 33.92 [29.00]     | 30.40 [26.00]            | 37.92 [38.50]         |
+| **Physiological parameters**   | **N** |                   | **Mean [IQR]**           |                       |
+| NEWS2 Total Score              | 401   | 2.51 [3.00]       | 2.10 [3.00]              | 3.40 [4.00]           |
+| Heart rate                     | 405   | 85.35 [20.00]     | 84.49 [19.00]            | 87.15 [23.50]         |
+| Oxygen saturation              | 404   | 96.22 [3.00]      | 96.54 [2.00]             | 95.56 [3.00]          |
+| Respiration rate               | 405   | 19.84 [2.00]      | 19.42 [2.00]             | 20.72 [3.00]          |
+| GCS score                      | 172   | 14.12 [1.00]      | 14.20 [1.00]             | 13.95 [1.00]          |
+| Systolic blood pressure        | 405   | 127.39 [29.00]    | 127.09 [26.50]           | 128.00 [32.00]        |
+| Diastolic blood pressure       | 405   | 72.69 [18.00]     | 73.20 [18.00]            | 71.63 [19.00]         |
+| Temperature                    | 405   | 37.12 [0.90]      | 37.12 [0.90]             | 37.11 [1.00]          |
+
+
