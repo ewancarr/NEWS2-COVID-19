@@ -119,11 +119,7 @@ def test_model(feature_set, dataset):
             'y_prob': y_prob})
 
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                                                                           ┃
-# ┃                      Test all parameter combinations                      ┃
-# ┃                                                                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# Test all features sets ------------------------------------------------------
 
 # NOTE: we're fitting a smaller set of features below, to exclude models
 # including comorbodities. This can be adjusted depending on data availability.
