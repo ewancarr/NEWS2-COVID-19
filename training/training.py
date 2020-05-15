@@ -13,15 +13,44 @@ from sklearn.impute import KNNImputer
 from sklearn.model_selection import RepeatedKFold
 from sklearn.metrics import (make_scorer,
                              roc_auc_score,
+                             confusion_matrix,
                              recall_score)
 from sklearn.linear_model import LogisticRegressionCV
-from functions import define_models, tn, tp, fn, fp, extract_scores
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                                                                           ┃
-# ┃                         SELECT VALIDATION SAMPLE                          ┃
-# ┃                                                                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# Define functions ------------------------------------------------------------
+def tn(y_true, y_pred):
+    return(confusion_matrix(y_true, y_pred)[0, 0])
+
+
+def fp(y_true, y_pred):
+    return(confusion_matrix(y_true, y_pred)[0, 1])
+
+
+def fn(y_true, y_pred):
+    return(confusion_matrix(y_true, y_pred)[1, 0])
+
+
+def tp(y_true, y_pred):
+    return(confusion_matrix(y_true, y_pred)[1, 1])
+
+
+def extract_scores(o):
+    roc = roc_auc_score(o['y_test'], o['y_prob'])
+    n_tp = tp(o['y_test'], o['y_pred'])
+    n_tn = tn(o['y_test'], o['y_pred'])
+    n_fp = fp(o['y_test'], o['y_pred'])
+    n_fn = fn(o['y_test'], o['y_pred'])
+    sens = np.mean(n_tp / (n_tp + n_fn))
+    spec = np.mean(n_tn / (n_tn + n_fp))
+    ppv = np.mean(n_tp / (n_tp + n_fp))
+    npv = np.mean(n_tn / (n_tn + n_fn))
+    n_samp = len(o['X_test'])
+    n_feat = np.shape(o['X_test'])[1]
+    return([roc, n_samp, n_feat, n_tp, n_tn, n_fp, n_fn, sens, spec, ppv, npv])
+
+
+# Select validation sample ----------------------------------------------------
 
 # Load CSV with admission blood parameters + 14 day outcome.
 baseline = pd.read_csv('baseline.csv')
@@ -36,8 +65,7 @@ valid = baseline[baseline['samp'] == 'VALIDATION']
 valid = valid.drop(labels='samp', axis=1)
 print(np.shape(valid))
 
-# Define scorers ==============================================================
-
+# Define scorers --------------------------------------------------------------
 roc_auc_scorer = make_scorer(roc_auc_score,
                              greater_is_better=True,
                              needs_threshold=True)
@@ -51,23 +79,23 @@ scoring = {'tp': make_scorer(tp),
            'recall': make_scorer(recall_score)}
 
 # Define models to fit --------------------------------------------------------
-
-fs, fs_labels = define_models()
+all_bloods = ['crp_sqrt', 'creatinine', 'albumin', 'estimatedgfr', 'alt',
+              'troponint', 'ferritin', 'lymphocytes_log10', 'neutrophils',
+              'plt', 'nlr_log10', 'lymph_crp_log', 'temp', 'oxsat', 'resp',
+              'hr', 'sbp', 'dbp', 'hb', 'gcs_score']
+comor = ['htn', 'diabetes', 'hf', 'ihd', 'copd', 'asthma', 'ckd']
+models = {'NEWS2': ['news2'],
+          'NEWS2 + DBP':  ['news2', 'age', 'male'] + all_bloods,
+          'NEWS2 + DBPC':  ['news2', 'age', 'male'] + all_bloods + comor}
 
 # Define final model, based on top features, by feature importance ------------
+models['FINAL'] = ['news2', 'crp_sqrt', 'neutrophils',
+                   'estimatedgfr', 'albumin', 'age']
 
-final_model = ['news2', 'crp_sqrt', 'neutrophils',
-               'estimatedgfr', 'albumin', 'age']
-fs.append(final_model)
-fs_labels.append('FINAL')
-
-# Set up inner CV =============================================================
-
+# Function to fit a single model ----------------------------------------------
 inner = RepeatedKFold(n_splits=10,
                       n_repeats=20,
                       random_state=42)
-
-# Function to fit a single model ----------------------------------------------
 
 
 def fit_imputed(v, train, valid):
@@ -99,40 +127,29 @@ def fit_imputed(v, train, valid):
     y_pred = clf.predict(X_test)
     y_prob = clf.predict_proba(X_test)[:, 1]
     # Return
-    imp = {'clf': clf,
-           'n_train': n_train,
-           'X_train': X_train,
-           'y_train': y_train,
-           'X_test': X_test,
-           'y_test': y_test,
-           'y_pred': y_pred,
-           'y_prob': y_prob}
-    return(imp)
+    return({'clf': clf,
+            'n_train': n_train,
+            'X_train': X_train,
+            'y_train': y_train,
+            'X_test': X_test,
+            'y_test': y_test,
+            'y_pred': y_pred,
+            'y_prob': y_prob})
 
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                                                                           ┃
-# ┃                      Test all parameter combinations                      ┃
-# ┃                                                                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+# Test all features sets ------------------------------------------------------
 fitted = {}
-for f, label in zip(fs, fs_labels):
+for label, features, label in models.items():
     print(label)
-    fitted[label] = {'imp': fit_imputed(f,
-                                        train=train,
-                                        valid=valid)}
+    fitted[label] = fit_imputed(features, valid, train)
 
 
-# Extract summaries
-
+# Extract summaries -----------------------------------------------------------
 column_names = ['roc', 'n_samp', 'n_feat', 'tp', 'tn', 'fp', 'fn', 'sens',
                 'spec', 'ppv', 'npv']
 scores = []
 for k, v in fitted.items():
-    scores.append(extract_scores(v['imp']))
+    scores.append(extract_scores(v))
 fit_summary = pd.DataFrame(scores,
                            columns=column_names)
-fit_summary['index'] = fs_labels
-
-fit_summary.to_csv('results.csv')
+fit_summary['index'] = models.keys()
