@@ -84,7 +84,7 @@ Some notes:
   ```{bash}
   conda env create -f conda.yml
   ```
-* If your using Singularity, you can use:
+* If you're using Singularity, you can use:
 
   ```{bash}
   singularity build python.simg singularity.def
@@ -154,9 +154,10 @@ All features must be measured at or shortly after hospital admission (within
 * Therefore, [`replicate.py`](replicate.py) will train the KNN imputation on
   the provided validation dataset (see [here](replicate.py#L109-L110)).
 
-# 
+# Descriptive statistics, by outcome
 
-# Descriptors of your cohort to allow comment about how different your cohort is from ours
+The below table can be used to compare/comment on differences between training
+and replication samples.
 
 |                                | N     | All patients      | No ICU/death<br> (n=393) | ICU/death<br> (n=159) |
 |--------------------------------|-------|-------------------|--------------------------|-----------------------|
@@ -194,5 +195,3 @@ All features must be measured at or shortly after hospital admission (within
 | Systolic blood pressure        | 405   | 127.39 [29.00]    | 127.09 [26.50]           | 128.00 [32.00]        |
 | Diastolic blood pressure       | 405   | 72.69 [18.00]     | 73.20 [18.00]            | 71.63 [19.00]         |
 | Temperature                    | 405   | 37.12 [0.90]      | 37.12 [0.90]             | 37.11 [1.00]          |
-
-
