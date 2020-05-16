@@ -1,4 +1,4 @@
-name: base
+name: news2
 channels:
   - conda-forge
   - defaults
