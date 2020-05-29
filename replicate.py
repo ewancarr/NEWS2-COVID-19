@@ -10,6 +10,7 @@ from joblib import load
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import RepeatedKFold
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.metrics import (make_scorer,
                              confusion_matrix,
                              roc_auc_score,
@@ -119,7 +120,7 @@ def test_model(feature_set, dataset):
             'y_prob': y_prob})
 
 
-# Test all features sets ------------------------------------------------------
+# Test all feature sets -------------------------------------------------------
 
 # NOTE: we're fitting a smaller set of features below, to exclude models
 # including comorbodities. This can be adjusted depending on data availability.
@@ -131,14 +132,44 @@ for label, features in models.items():
     print(features)
     fitted[label] = test_model(label, validation)
 
+# Test threshold model --------------------------------------------------------
+
+# Impute, derive binary items
+y = validation['y']
+imputer = KNNImputer()
+thresholds = pd.DataFrame(imputer.fit_transform(validation),
+                          columns=list(validation))
+thresholds = thresholds[['news2', 'crp', 'neutrophils', 
+                        'estimatedgfr', 'albumin', 'age']]
+thresholds['news2'] = thresholds['news2'] > 5.1
+thresholds['crp'] = thresholds['crp'] >= 173.6
+thresholds['albumin'] = thresholds['albumin'] <= 31.1
+thresholds['estimatedgfr'] = thresholds['estimatedgfr'] <= 31.6
+thresholds['neutrophils'] = thresholds['neutrophils'] > 8.77
+# Fit logistic model with binary items
+inner = RepeatedKFold(n_splits=10, n_repeats=20, random_state=42)
+clf = LogisticRegressionCV(cv=inner,
+                           penalty='l1',
+                           Cs=10**np.linspace(0.1, -3, 50),
+                           random_state=42,
+                           solver='liblinear',
+                           scoring=roc_auc_scorer).fit(thresholds, y)
+# Return scores
+scores_threshold = extract_scores({'X': thresholds,
+                                   'y': y,
+                                   'y_pred': clf.predict(thresholds),
+                                   'y_prob': clf.predict_proba(thresholds)[:, 1]})
+scores_threshold.append('THRESHOLD')
 
 # Extract summaries -----------------------------------------------------------
-column_names = ['roc', 'n_samp', 'n_feat', 'tp', 'tn', 'fp', 'fn', 'sens',
-                'spec', 'ppv', 'npv']
+column_names = ['roc', 'n_samp', 'n_feat', 'tp', 'tn', 'fp',
+                'fn', 'sens', 'spec', 'ppv', 'npv', 'model']
 scores = []
 for k, v in fitted.items():
-    scores.append(extract_scores(v))
+    s = extract_scores(v)
+    s.append(k)
+    scores.append(s)
+scores.append(scores_threshold)
 fit_summary = pd.DataFrame(scores,
                            columns=column_names)
-fit_summary['index'] = models.keys()
 print(fit_summary)
