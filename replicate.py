@@ -16,7 +16,6 @@ from sklearn.metrics import (make_scorer,
                              roc_auc_score,
                              recall_score)
 
-
 # Functions -------------------------------------------------------------------
 def extract_scores(o):
     roc = roc_auc_score(o['y'], o['y_prob'])
@@ -32,22 +31,39 @@ def extract_scores(o):
     n_feat = np.shape(o['X'])[1]
     return([roc, n_samp, n_feat, n_tp, n_tn, n_fp, n_fn, sens, spec, ppv, npv])
 
-
 def tn(y_true, y_pred):
     return(confusion_matrix(y_true, y_pred)[0, 0])
-
 
 def fp(y_true, y_pred):
     return(confusion_matrix(y_true, y_pred)[0, 1])
 
-
 def fn(y_true, y_pred):
     return(confusion_matrix(y_true, y_pred)[1, 0])
-
 
 def tp(y_true, y_pred):
     return(confusion_matrix(y_true, y_pred)[1, 1])
 
+def define_thresholds(df):
+    return({'news2': {'conditions': [(df['news2'] > 5.1) & (df['news2'].notna()),
+                                     (df['news2'] <= 5.1) & (df['news2'].notna()),
+                                     df['news2'].isna()],
+                      'choices': [1, 0, np.nan]},
+            'crp': {'conditions': [(df['crp'] >= 173.6) & (df['crp'].notna()),
+                                   (df['crp'] < 173.6) & (df['crp'].notna()),
+                                   df['crp'].isna()],
+                    'choices': [1, 0, np.nan]},
+            'albumin': {'conditions': [(df['albumin'] <= 31.6) & (df['albumin'].notna()),
+                                       (df['albumin'] > 31.6) & (df['albumin'].notna()),
+                                       df['albumin'].isna()],
+                        'choices': [1, 0, np.nan]},
+            'estimatedgfr': {'conditions': [(df['estimatedgfr'] <= 31.6) & (df['estimatedgfr'].notna()),
+                                            (df['estimatedgfr'] > 31.6) & (df['estimatedgfr'].notna()),
+                                            df['estimatedgfr'].isna()],
+                             'choices': [1, 0, np.nan]},
+            'neutrophils': {'conditions': [(df['neutrophils'] > 8.77) & (df['neutrophils'].notna()),
+                                           (df['neutrophils'] <= 8.77) & (df['neutrophils'].notna()),
+                                           df['neutrophils'].isna()],
+                            'choices': [1, 0, np.nan]}})
 
 # Define scoring --------------------------------------------------------------
 roc_auc_scorer = make_scorer(roc_auc_score,
@@ -88,11 +104,6 @@ models['FINAL'] = ['news2', 'crp_sqrt', 'neutrophils',
                    'estimatedgfr', 'albumin', 'age']
 
 # Function to fit a single model ----------------------------------------------
-inner = RepeatedKFold(n_splits=10,
-                      n_repeats=20,
-                      random_state=42)
-
-
 def test_model(feature_set, dataset):
     """
     Test validation sample on pre-trained model for a given feature set.
@@ -125,41 +136,36 @@ def test_model(feature_set, dataset):
 # NOTE: we're fitting a smaller set of features below, to exclude models
 # including comorbodities. This can be adjusted depending on data availability.
 del models['NEWS2 + DBPC']
-
 fitted = {}
 for label, features in models.items():
-    print(label)
-    print(features)
     fitted[label] = test_model(label, validation)
 
 # Test threshold model --------------------------------------------------------
-
-# Impute, derive binary items
+thresholds = define_thresholds(validation)
+final = ['news2', 'crp', 'neutrophils', 'estimatedgfr', 'albumin']
 y = validation['y']
+X = validation[['age'] + final]
+# Dichotomise, based on decision tree
+for f in final:
+    if f != 'age':
+        v = thresholds[f]
+        X[f + '_bin'] =  np.select(v['conditions'], v['choices'])
+        print(X[f + '_bin'].value_counts())
+# Impute, based on continuous variables
 imputer = KNNImputer()
-thresholds = pd.DataFrame(imputer.fit_transform(validation),
-                          columns=list(validation))
-thresholds = thresholds[['news2', 'crp', 'neutrophils', 
-                        'estimatedgfr', 'albumin', 'age']]
-thresholds['news2'] = thresholds['news2'] > 5.1
-thresholds['crp'] = thresholds['crp'] >= 173.6
-thresholds['albumin'] = thresholds['albumin'] <= 31.1
-thresholds['estimatedgfr'] = thresholds['estimatedgfr'] <= 31.6
-thresholds['neutrophils'] = thresholds['neutrophils'] > 8.77
-# Fit logistic model with binary items
-inner = RepeatedKFold(n_splits=10, n_repeats=20, random_state=42)
-clf = LogisticRegressionCV(cv=inner,
-                           penalty='l1',
-                           Cs=10**np.linspace(0.1, -3, 50),
-                           random_state=42,
-                           solver='liblinear',
-                           scoring=roc_auc_scorer).fit(thresholds, y)
-# Return scores
-scores_threshold = extract_scores({'X': thresholds,
-                                   'y': y,
-                                   'y_pred': clf.predict(thresholds),
-                                   'y_prob': clf.predict_proba(thresholds)[:, 1]})
-scores_threshold.append('THRESHOLD')
+X = pd.DataFrame(imputer.fit_transform(X),
+                 columns=list(X))
+X = X[['age'] + [f + '_bin' for f in final]]
+# Load pre-trained model and predict
+clf = load('training/trained_models/' + 'clf_THRESHOLD.joblib')
+y_pred = clf.predict(X)
+y_prob = clf.predict_proba(X)[:, 1]
+# Save
+fitted['THRESHOLD'] = {'clf': clf,
+                       'X': X,
+                       'y': y,
+                       'y_pred': y_pred,
+                       'y_prob': y_prob}
 
 # Extract summaries -----------------------------------------------------------
 column_names = ['roc', 'n_samp', 'n_feat', 'tp', 'tn', 'fp',
@@ -169,7 +175,7 @@ for k, v in fitted.items():
     s = extract_scores(v)
     s.append(k)
     scores.append(s)
-scores.append(scores_threshold)
+# scores.append(scores_threshold)
 fit_summary = pd.DataFrame(scores,
                            columns=column_names)
 print(fit_summary)
