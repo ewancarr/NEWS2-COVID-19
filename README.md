@@ -1,18 +1,22 @@
-# Supplementing the National Early Warning Score (NEWS2) for anticipating early deterioration among patients with COVID-19 infection
+# Evaluation and Improvement of the National Early Warning Score (NEWS2) for COVID-19: a multi-hospital study
 
-Ewan Carr<sup>\*</sup>, Rebecca Bendayan<sup>\*</sup>, Daniel Bean, Kevin O'Gallagher, Andrew Pickles,
-Daniel Stahl, Rosita Zakeri, Thomas Searle, Anthony Shek, Zeljko Kraljevic,
-James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard Dobson<sup>\#</sup>
-doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
+Ewan Carr<sup>\*</sup> Rebecca Bendayan<sup>\*</sup>, Daniel Bean, Matthew
+Stammers, Wenjuan Wang, Huayu Zhang, Thomas Searle, Zeljko Kraljevic, Anthony
+Shek, Hang T T Phan, Walter Muruet, Anthony J Shinton, Ting Shi, Xin Zhang,
+Andrew Pickles, Daniel Stahl, Rosita Zakeri, Kevin O'Gallagher, Amos Folarin,
+Lukasz Roguski, Florina Borca, James Batchelor, Xiaodong Wu, Jiaxing Sun,
+Ashwin Pinto, Bruce Guthrie, Cormac Breen, Abdel Douiri, Honghan Wu, Vasa
+Curcin, James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard
+Dobson<sup>\#</sup> doi:
+[2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 
 <sup>\*\#</sup>Joint authors
-
 
 ## Overview
 
 * This repository provides pre-trained models to validate models in the
   [medRxiv
-  pre-print](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v2). 
+  pre-print](https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v3). 
 * Please get in touch if you would like to collaborate on this replication
   (clinical contact: <a
   href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#106;&#97;&#109;&#101;&#115;&#116;&#101;&#111;&#64;&#110;&#104;&#115;&#46;&#110;&#101;&#116;">&#106;&#97;&#109;&#101;&#115;&#116;&#101;&#111;&#64;&#110;&#104;&#115;&#46;&#110;&#101;&#116;</a>;
