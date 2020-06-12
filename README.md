@@ -1,16 +1,16 @@
 # Evaluation and Improvement of the National Early Warning Score (NEWS2) for COVID-19: a multi-hospital study
 
-Ewan Carr<sup>\*</sup> Rebecca Bendayan<sup>\*</sup>, Daniel Bean, Matthew
-Stammers, Wenjuan Wang, Huayu Zhang, Thomas Searle, Zeljko Kraljevic, Anthony
-Shek, Hang T T Phan, Walter Muruet, Anthony J Shinton, Ting Shi, Xin Zhang,
-Andrew Pickles, Daniel Stahl, Rosita Zakeri, Kevin O'Gallagher, Amos Folarin,
-Lukasz Roguski, Florina Borca, James Batchelor, Xiaodong Wu, Jiaxing Sun,
-Ashwin Pinto, Bruce Guthrie, Cormac Breen, Abdel Douiri, Honghan Wu, Vasa
-Curcin, James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard
-Dobson<sup>\#</sup> doi:
-[2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
+> Ewan Carr<sup>\*</sup>, Rebecca Bendayan<sup>\*</sup>, Daniel Bean, Matthew
+> Stammers, Wenjuan Wang, Huayu Zhang, Thomas Searle, Zeljko Kraljevic, Anthony
+> Shek, Hang T T Phan, Walter Muruet, Anthony J Shinton, Ting Shi, Xin Zhang,
+> Andrew Pickles, Daniel Stahl, Rosita Zakeri, Kevin O'Gallagher, Amos Folarin,
+> Lukasz Roguski, Florina Borca, James Batchelor, Xiaodong Wu, Jiaxing Sun,
+> Ashwin Pinto, Bruce Guthrie, Cormac Breen, Abdel Douiri, Honghan Wu, Vasa
+> Curcin, James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard
+> Dobson<sup>\#</sup> > 
+> <sup>\*\#</sup>Joint authors
 
-<sup>\*\#</sup>Joint authors
+doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 
 ## Overview
 
