@@ -7,8 +7,9 @@
 > Lukasz Roguski, Florina Borca, James Batchelor, Xiaodong Wu, Jiaxing Sun,
 > Ashwin Pinto, Bruce Guthrie, Cormac Breen, Abdel Douiri, Honghan Wu, Vasa
 > Curcin, James T Teo<sup>\#</sup>, Ajay Shah<sup>\#</sup>, Richard
-> Dobson<sup>\#</sup> > 
-> <sup>\*\#</sup>Joint authors
+> Dobson<sup>\#</sup>  
+
+<sup>\*\#</sup>Joint authors
 
 doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 
@@ -28,14 +29,50 @@ doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 
 # How to use this repository
 
-The file [`replicate.py`](replicate.py) will fit a series of models using
-pre-trained models. Specifically, it:
+The file [`replicate.py`](replicate.py) validates four models that were
+initially trained on the KCH sample. The four models are:
 
-1. Imports a CSV file containing the required features and outcome.
-2. For each feature set, it loads a pre-trained model (see
-   [here][training/trained_models]) and tests this on the new data.
+<table>
+<thead>
+  <tr>
+    <th>Model</th>
+    <th>Endpoint</th>
+    <th>Included features</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>1</td>
+    <td rowspan="2">3-day ICU/death</td>
+    <td>NEWS2, oxygen litres, urea, age, oxygen saturation, CRP, estimated GFR, neutrophils, platelets, neutrophil/lymphocyte ratio</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>NEWS2 only</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td rowspan="2">14-day ICU/death</td>
+    <td>NEWS2, oxygen litres</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>NEWS2 only</td>
+  </tr>
+</tbody>
+</table>
 
-Some notes:
+The script imports the validation dataset (`validation.csv`) or generates a
+simulated dataset if this is missing. For each model (1-4), we:
+
+1. Evaluate discrimination of the pre-trained models (loaded from
+   [`pretrained.joblib`](pretrained.joblib)) in the validaton dataset.
+2. Generate estimates needed for calibration plots;
+3. Test re-calbrated models, based on:
+    * Shrinkage factors derived from internal validation;
+    * Recalibration in the validation sample, based on [Platt's method][plat].
+
+The estimates are then saved (using `joblib.dump`). Some notes:
 
 * The code does not perform any training or cross-validation, with the
   exception of KNN imputation, see [below](#missing-data).
@@ -43,6 +80,8 @@ Some notes:
   is quite specific to the structure of the source data. It should demonstrate
   how we prepared the training and validation datasets, but will likely require
   modification before running on replication samples.
+
+[plat]: https://scikit-learn.org/stable/modules/calibration.html#usage
 
 ## Setup
 
