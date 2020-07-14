@@ -45,15 +45,15 @@ def tp(y_true, y_pred):
 
 
 def npv(y_true, y_pred):
-    tn = confusion_matrix(y_true, y_pred)[1, 1]
-    fn = confusion_matrix(y_true, y_pred)[0, 1]
-    return(np.mean(tn / (tn + fn)))
+    n_tn = tn(y_true, y_pred)
+    n_fn = fn(y_true, y_pred)
+    return(np.mean(n_tn / (n_tn + n_fn)))
 
 
 def ppv(y_true, y_pred):
-    tp = confusion_matrix(y_true, y_pred)[0, 0]
-    fp = confusion_matrix(y_true, y_pred)[1, 0]
-    return(np.mean(tp / (tp + fp)))
+    n_tp = tp(y_true, y_pred)
+    n_fp = fp(y_true, y_pred)
+    return(np.mean(n_tp / (n_tp + n_fp)))
 
 
 scorers = {'auc': 'roc_auc',
