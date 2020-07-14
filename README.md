@@ -169,7 +169,7 @@ The 10 required features are listed below:
 * Data cleaning and training was performed in Python 3.8.2 using
   [scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages
   is required (`pandas`, `numpy`, `scikit-learn`; see
-  [`requirements.txt`](software/requirments.txt)).
+  [`requirements.txt`](requirments.txt)).
 
     ```
     joblib==0.14.1
