@@ -18,7 +18,8 @@ def savefig(fn):
 def simulate_data(n, features):
     X = np.random.rand(n, features)
     y = np.random.randint(0, 1 + 1, n)
-    y = pd.DataFrame({'y3': y, 'y14': y})
+    nosoc = np.random.randint(0, 1 + 1, n)
+    y = pd.DataFrame({'y3': y, 'y14': y, 'nosoc': nosoc})
     X = pd.DataFrame(X, columns=['news2', 'oxlt', 'urea', 'age', 'oxsat',
                                  'crp', 'estimatedgfr', 'neutrophils',
                                  'plt', 'nlr'])
