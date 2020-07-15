@@ -28,7 +28,7 @@ doi: [2020.04.24.20078006](https://doi.org/10.1101/2020.04.24.20078006)
 
 [medrxiv]: https://www.medrxiv.org/content/10.1101/2020.04.24.20078006v3
 
-## How to use this repository
+## About the models
 
 The file [`replicate.py`](replicate.py) validates four models that were
 initially trained on the KCH sample. The four models are:
@@ -54,7 +54,7 @@ initially trained on the KCH sample. The four models are:
   <tr>
     <td rowspan="2">14-day ICU/death</td>
     <td>3</td>
-    <td>NEWS2, oxygen litres, urea, age, oxygen saturation, CRP, estimated GFR, neutrophils, platelets, neutrophil/lymphocyte ratio</td>
+    <td>NEWS2, oxygen litres, urea, age, oxygen saturation, CRP, estimated GFR, neutrophils, neutrophil/lymphocyte ratio</td>
   </tr>
   <tr>
     <td>4</td>
@@ -62,6 +62,7 @@ initially trained on the KCH sample. The four models are:
   </tr>
 </tbody>
 </table>
+
 
 The script imports a validation dataset (`validation.csv`) or generates a
 simulated dataset if this is missing. For each model (1-4), we:
@@ -72,7 +73,7 @@ simulated dataset if this is missing. For each model (1-4), we:
 3. Test re-calbrated models, based on:
     * Shrinkage factors derived from internal validation;
     * Recalibration in the validation sample, based on [Platt's method][plat].
-4. The estimates are then saved (using `joblib.dump`). 
+4. Save the estimates (via `joblib.dump`). 
 
 Some notes:
 
@@ -85,6 +86,14 @@ Some notes:
 
 [plat]: https://scikit-learn.org/stable/modules/calibration.html#usage
 
+
+## How to use this repository
+
+1. Prepare your validation dataset (named `validation.csv`) and according to 
+   the below specification.
+2. Run [`replicate.py`](replicate.py).
+3. Email the resulting `replication.joblib` file to <a
+  href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#101;&#119;&#97;&#110;&#46;&#99;&#97;&#114;&#114;&#64;&#107;&#99;&#108;&#46;&#97;&#99;&#46;&#117;&#107;">&#101;&#119;&#97;&#110;&#46;&#99;&#97;&#114;&#114;&#64;&#107;&#99;&#108;&#46;&#97;&#99;&#46;&#117;&#107;</a>.
 
 ## Measures needed to validate these models
 
@@ -109,27 +118,27 @@ In the KCH training sample (n=1276) the event rates were as follows:
 | 3-day ICU/death  | 163 (12.8%) |
 | 14-day ICU/death | 389 (30.5%) |
 
-The time-to-event is shown below:
+The time-to-event for the training sample shown below:
 
 <img src="images/kaplan_combined.png" width="80%" />
 
 
-### Features
+### Required variables
 
-The 10 required features are listed below:
+The 10 required variables are listed below:
 
-|                            | Column            | Measure                                         | Transformation   |
-| -------------------------- | ----------------- | ----------------------------------------------- | ---------------- |
-| Demographics               | `age`             | Age at admission in years                       | None             |
-| Blood parameters           | `crp`             | C-reative protein (CRP; mg/L)                   | `np.sqrt`        |
-|                            | `estimatedgfr`    | Estimated Glomerular Filtration Rate (mL/min)   | None             |
-|                            | `neutrophils`     | Neutrophil count (x 10<sup>9</sup>)             | `np.sqrt`        |
-|                            | `plt`             | Platelet count (x 10<sup>9</sup>)               | None             |
-|                            | `nlr`             | Neutrophil-to-lymphocyte ratio                  | `np.log`         |
-|                            | `urea`            | Urea (mmol/L)                                   | `np.sqrt`        |
-| Physiological parameters   | `news2`           | NEWS2 total score                               | None             |
-|                            | `oxsat`           | Oxygen saturation (%)                           | None             |
-|                            | `oxlt`            | Oxygen litres                                   | None             |
+|                            |                | Measure                                         | Transformation   | Range in KCH |
+| ------------------------   | -------------- | ----------------------------------------------- | :--------------: | -----------: |
+| *Demographics*             | `age`          | Age at admission in years                       | None             | 20-99        |
+| *Blood parameters*         | `crp`          | C-reative protein (CRP; mg/L)                   | `np.sqrt`        | 1.3-19.0     |
+|                            | `estimatedgfr` | Estimated Glomerular Filtration Rate (mL/min)   | None             | 4-90         |
+|                            | `neutrophils`  | Neutrophil count (x 10<sup>9</sup>)             | `np.sqrt`        | 0.8-4.6      |
+|                            | `nlr`          | Neutrophil-to-lymphocyte ratio                  | `np.log`         | -0.3-3.6     |
+|                            | `urea`         | Urea (mmol/L)                                   | `np.sqrt`        | 1.3-6.2      |
+| *Physiological parameters* | `news2`        | NEWS2 total score                               | None             | 0-10         |
+|                            | `oxsat`        | Oxygen saturation (%)                           | None             | 87-100       |
+|                            | `oxlt`         | Oxygen litres                                   | None             | 0-15         |
+| *Other*                    | `nosoc`        | Nosocomial patient (0/1)                        | None             | 0-1          |
 
 #### Important
 
@@ -140,27 +149,32 @@ The 10 required features are listed below:
   top/bottom 1% of values to the 1st and 99th percentile values. Python code
   to achieve this can be found in [`cleaning.py`](cleaning.py):
 
-    ```python
-    to_trim = ['crp', 'estimatedgfr', 'neutrophils', 'plt', 'urea', 'nlr', 'oxsat', 'oxlt', 'news2']
+  ```python
+  to_trim = ['crp', 'estimatedgfr', 'neutrophils', 'plt', 'urea', 'nlr', 'oxsat', 'oxlt', 'news2']
+  df[to_trim] = df[to_trim].clip(lower=df[to_trim].quantile(0.01),
+                                 upper=df[to_trim].quantile(0.99),
+                                 axis=1)
+  ```
 
-    df[to_trim] = df[to_trim].clip(lower=df[to_trim].quantile(0.01),
-                                   upper=df[to_trim].quantile(0.99),
-                                   axis=1)
-    ```
-* Some features (`crp`, `neutrophils`, `nlr`, `urea`) require transformation, 
+* Some features (`crp`, `neutrophils`, `nlr`, `urea`) require transformation,
   as summarised in the table.
+* Oxygen litres (`oxlt`) should be scored as 0 for patients not on supplemental
+  oxygen.
+* The variable `nosoc` identifies nosocomial patients (i.e. those developing
+  COVID infection in hospital). This is used to stratify the models. It should
+  be set to 1 for patients developing COVID infection after hospital admission;
+  0 for all other patients.  If all patients in your validation sample have
+  community-acquired COVID infection, set `nosoc` to 0 for all patients (this
+  will skip running the relevant models).
 
 ## Cohort selection 
 
 * The training sample was defined as all adult inpatients testing positive for
   SARS-Cov2 by reverse transcription polymerase chain reaction (RT-PCR);
-
 * All patients included in the study had symptoms consistent with COVID-19
   disease (e.g. cough, fever, dyspnoea, myalgia, delirium).
-
 * We excluded subjects who were seen in the emergency department but not
   admitted. 
-
 * The training sample included patients testing positive for SARS-Cov2 between
   1<sup>st</sup> and 30<sup>th</sup> April 2020. 
 
@@ -168,7 +182,7 @@ The 10 required features are listed below:
 
 * Data cleaning and training was performed in Python 3.8.2 using
   [scikit-learn](https://scikit-learn.org/stable/). A minimal set of packages
-  is required (`pandas`, `numpy`, `scikit-learn`; see
+  is required (`pandas`, `numpy`, `scikit-learn`, `statsmodels`; see
   [`requirements.txt`](requirments.txt)).
 
     ```
@@ -180,13 +194,10 @@ The 10 required features are listed below:
     scipy==1.4.1
     statsmodels==0.11.1
     ```
-    
 * For testing purposes, `replicate.py` will generate simulated data if a
   validation is not provided. These values are randomly generated and are not
   representative of the training dataset.
-
 * To test all models on the simulated dataset:
-
     ```bash
     git clone https://github.com/ewancarr/NEWS2-COVID-19
     cd NEWS2-COVID-19
@@ -196,10 +207,15 @@ The 10 required features are listed below:
 
 ## Missing data
 
-* During training, missing feature information was imputed using KNN imputation
-  ([`sklearn.impute.KNNImputer`](https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html)). 
-* However, this repository does not provide the pre-trained KNN model, since
-  the fitted object contains data that cannot be shared publicly.  
-* Therefore, [`replicate.py`](replicate.py) will train the KNN imputation on
-  the provided validation dataset (see
-  [here](https://github.com/ewancarr/NEWS2-COVID-19/blob/a6ef31bd17210492c693b442dbeade5b76c21efb/replicate.py#L49)).
+* Missing feature information in the training sample was imputed using KNN
+  imputation ([`sklearn.impute.KNNImputer`][knn]). 
+* However, since the trained KNN models would contain a copy of the training
+  data, which cannot be shared publically, this repository does not provide
+  pre-trained KNN models.
+* Therefore, [`replicate.py`](replicate.py) will train the KNN imputation
+  models on the provided validation dataset (see [here][here]). This only
+  applies to imputation; for all other models pre-trainied models are used.
+
+
+[knn]: https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html
+[here]: https://github.com/ewancarr/NEWS2-COVID-19/blob/a6ef31bd17210492c693b442dbeade5b76c21efb/replicate.py#L49
