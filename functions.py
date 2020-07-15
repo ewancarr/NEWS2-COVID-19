@@ -17,12 +17,12 @@ def savefig(fn):
 
 def simulate_data(n, features):
     X = np.random.rand(n, features)
-    y = np.random.randint(0, 1 + 1, n)
-    nosoc = np.random.randint(0, 1 + 1, n)
-    y = pd.DataFrame({'y3': y, 'y14': y, 'nosoc': nosoc})
+    y3 = np.random.binomial(1, 0.6, size=n)
+    y14 = np.random.binomial(1, 0.6, size=n)
+    nosoc = np.random.binomial(1, 0.2, size=n)
+    y = pd.DataFrame({'y3': y3, 'y14': y14, 'nosoc': nosoc})
     X = pd.DataFrame(X, columns=['news2', 'oxlt', 'urea', 'age', 'oxsat',
-                                 'crp', 'estimatedgfr', 'neutrophils',
-                                 'plt', 'nlr'])
+                                 'crp', 'estimatedgfr', 'neutrophils', 'nlr'])
     return(pd.concat([X, y], axis=1))
 
 
