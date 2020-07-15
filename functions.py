@@ -44,29 +44,39 @@ def tp(y_true, y_pred):
     return(confusion_matrix(y_true, y_pred)[1, 1])
 
 
-def npv(y_true, y_pred):
-    n_tn = tn(y_true, y_pred)
-    n_fn = fn(y_true, y_pred)
-    return(np.mean(n_tn / (n_tn + n_fn)))
+def calc_npv(y_true, y_pred):
+    n_tn = int(tn(y_true, y_pred))
+    n_fn = int(fn(y_true, y_pred))
+    if n_tn == 0:
+        npv = np.nan
+    else:
+        with np.errstate(invalid='ignore'):
+            npv = np.mean(n_tn / (n_tn + n_fn))
+    return(npv)
 
 
-def ppv(y_true, y_pred):
-    n_tp = tp(y_true, y_pred)
-    n_fp = fp(y_true, y_pred)
-    return(np.mean(n_tp / (n_tp + n_fp)))
+def calc_ppv(y_true, y_pred):
+    n_tp = int(tp(y_true, y_pred))
+    n_fp = int(fp(y_true, y_pred))
+    if n_tp == 0:
+        ppv = np.nan
+    else:
+        with np.errstate(invalid='ignore'):
+            ppv = np.mean(n_tp / (n_tp + n_fp))
+    return(ppv)
 
 
 scorers = {'auc': 'roc_auc',
            'sens': make_scorer(recall_score),
            'spec': make_scorer(recall_score, pos_label=0),
-           'ppv': make_scorer(ppv),
-           'npv': make_scorer(npv),
+           'ppv': make_scorer(calc_ppv),
+           'npv': make_scorer(calc_npv),
            'tp': make_scorer(tp),
            'tn': make_scorer(tn),
            'fp': make_scorer(fp),
            'fn': make_scorer(fn),
            'brier': make_scorer(brier_score_loss,
-                                greater_is_better=True,
+                                greater_is_better=False,
                                 needs_proba=True)}
 
 
@@ -98,18 +108,24 @@ def pick_1se(cv_results):
     return(best_idx)
 
 
-def extract_scores(y, y_pred, y_prob):
-    roc = roc_auc_score(y, y_prob)
-    n_tp = tp(y, y_pred)
+def calc_spec(y, y_pred):
     n_tn = tn(y, y_pred)
     n_fp = fp(y, y_pred)
-    n_fn = fn(y, y_pred)
-    sens = np.mean(n_tp / (n_tp + n_fn))
-    spec = np.mean(n_tn / (n_tn + n_fp))
-    ppv = np.mean(n_tp / (n_tp + n_fp))
-    npv = np.mean(n_tn / (n_tn + n_fn))
-    n_samp = len(y)
-    return([roc, n_samp, n_tp, n_tn, n_fp, n_fn, sens, spec, ppv, npv])
+    return(np.mean(n_tn / (n_tn + n_fp)))
+
+
+def extract_scores(y, y_pred, y_prob):
+    return({'auc': roc_auc_score(y, y_prob),
+            'tp': tp(y, y_pred),
+            'tn': tn(y, y_pred),
+            'fp': fp(y, y_pred),
+            'fn': fn(y, y_pred),
+            'sens': recall_score(y, y_pred),
+            'spec': calc_spec(y, y_pred),
+            'ppv': calc_ppv(y, y_pred),
+            'npv': calc_npv(y, y_pred),
+            'brier': brier_score_loss(y, y_prob),
+            'n_samp': len(y)})
 
 
 def calibration_slope(clf, X, y, y_prob, lp):
