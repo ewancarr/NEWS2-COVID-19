@@ -45,24 +45,23 @@ initially trained on the KCH sample. The four models are:
   <tr>
     <td rowspan="2">3-day ICU/death</td>
     <td>1</td>
-    <td>NEWS2, oxygen litres</td>
+    <td>NEWS2 only</td>
   </tr>
   <tr>
     <td>2</td>
-    <td>NEWS2 only</td>
+    <td>NEWS2, oxygen litres</td>
   </tr>
   <tr>
     <td rowspan="2">14-day ICU/death</td>
     <td>3</td>
-    <td>NEWS2, oxygen litres, urea, age, oxygen saturation, CRP, estimated GFR, neutrophils, neutrophil/lymphocyte ratio</td>
+    <td>NEWS2 only</td>
   </tr>
   <tr>
     <td>4</td>
-    <td>NEWS2 only</td>
+    <td>NEWS2, oxygen litres, urea, age, oxygen saturation, CRP, estimated GFR, neutrophils, neutrophil/lymphocyte ratio</td>
   </tr>
 </tbody>
 </table>
-
 
 The script imports a validation dataset (`validation.csv`) or generates a
 simulated dataset if this is missing. For each model (1-4), we:
