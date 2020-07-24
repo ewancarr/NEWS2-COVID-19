@@ -20,7 +20,7 @@ else:
 # Load pre-trained models -----------------------------------------------------
 pretrained = load('pretrained.joblib')
 
-# Confirm that validation dataset contains all required features/outcomes -----
+# Confirm that validation dataset contains required features/outcomes ---------
 avail = list(sample)
 req = ['y3', 'y14', 'news2', 'oxlt', 'urea', 'age', 'oxsat', 'crp',
        'estimatedgfr', 'neutrophils', 'nlr', 'nosoc']
@@ -30,6 +30,26 @@ except KeyError:
     print('Not all required variables in provided dataset; please check.')
 
 
+# Apply required transformations ----------------------------------------------
+if True:
+    # NOTE: set to False if transformations have already been applied.
+
+    # Windsorize
+    to_trim = ['crp', 'estimatedgfr', 'neutrophils', 'urea', 'nlr',
+               'oxsat', 'oxlt']
+    sample[to_trim] = sample[to_trim] \
+        .clip(lower=sample[to_trim].quantile(0.01),
+              upper=sample[to_trim].quantile(0.99),
+              axis=1)
+
+    # Transform to address skew
+    for v in ['neutrophils', 'urea', 'crp']:
+        sample[v] = np.sqrt(sample[v])
+
+    sample['nlr'] = np.log(sample['nlr'])
+
+
+# Test each model -------------------------------------------------------------
 def test_model(k, v, data):
     results = {}
     if k[4] == 'nosoc':
