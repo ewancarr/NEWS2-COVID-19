@@ -87,6 +87,8 @@ def test_model(k, v, data):
     y_logp = np.log(y_prob / (1 - y_prob))
     results['recal'] = get_summaries(clf_recal, X, y, y_prob,
                                      y_pred, lp=y_logp)
+    # Store outcome rate
+    results['meany'] = np.mean(y)
     return(results)
 
 
