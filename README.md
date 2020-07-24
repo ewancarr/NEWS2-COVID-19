@@ -94,17 +94,28 @@ Some notes:
 3. Email the resulting `replication.joblib` file to <a
   href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#101;&#119;&#97;&#110;&#46;&#99;&#97;&#114;&#114;&#64;&#107;&#99;&#108;&#46;&#97;&#99;&#46;&#117;&#107;">&#101;&#119;&#97;&#110;&#46;&#99;&#97;&#114;&#114;&#64;&#107;&#99;&#108;&#46;&#97;&#99;&#46;&#117;&#107;</a>.
 
+**Please note:** Some variables require transformation. The script
+[`replicate.py`][trans] provides code to perform these. If your validation dataset has already been transformed (as per the below specifications) you will need to disable this part of the script, by switching `True` to `False`:
+
+```python
+if True:
+    # NOTE: set to False if transformations have already been applied.
+```
+
+[trans]: https://github.com/ewancarr/NEWS2-COVID-19/blob/412454e306f973af7b797ca19c51bf306c760f2e/replicate.py#L33
+
 ## Measures needed to validate these models
 
 ### Outcomes 
 
 * We're using a combined outcome of transfer to ICU or death (WHO-COVID-19
-  Outcomes Scales 6-8) within 3 or 14 days following index date.
+  Outcomes Scales 6-8) within 3 or 14 days following index date. Index date is
+  defined as follows:
     * For non-nosocomial patients (i.e. community-acquired COVID infection)
-      index date is hospital admission.
-    * For nosocomial patients index date is the date of symptom onset. If onset
-      is unavailable the date of diagnosis (positive SARS-CoV-2 RT-PCR) minus 4
-      days can be used instead.
+      **index date is hospital admission**.
+    * For nosocomial patients **index date is the date of symptom onset**. If
+      onset is unavailable the date of diagnosis (positive SARS-CoV-2 RT-PCR)
+      minus 4 days can be used instead.
 * Each outcome is coded as 1 if the patient was transferred to ICU or died
   within the period (3 days or 14 days, respectively); 0 otherwise. All
   patients not experiencing the outcome must have reached the respective
@@ -136,29 +147,30 @@ The 10 required variables are listed below:
 |                            | `urea`         | Urea (mmol/L)                                   | `np.sqrt`        | 1.3-6.2      |
 | *Physiological parameters* | `news2`        | NEWS2 total score                               | None             | 0-10         |
 |                            | `oxsat`        | Oxygen saturation (%)                           | None             | 87-100       |
-|                            | `oxlt`         | Oxygen litres                                   | None             | 0-15         |
+|                            | `oxlt`         | Oxygen litres (L/min)                           | None             | 0-15         |
 | *Other*                    | `nosoc`        | Nosocomial patient (0/1)                        | None             | 0-1          |
 
-#### Important
+#### Transformations
+
+Some features must be transformed before use:
+
+* All continuous features must be
+  [winsorized](https://en.wikipedia.org/wiki/Winsorizing) by setting the
+  top/bottom 1% of values to the 1st and 99th percentile values.     
+* Some features (`crp`, `neutrophils`, `nlr`, `urea`) require
+  transformation as listed in the table.
+
+The provided script will carry out these transformation on the provided dataset
+(see [here][trans]). If your data are already transformmed you will need to
+disable this section of the script, by setting `True` to `False`.
+
+### Important
 
 * All features must be measured within 48 hours of index date (hospital
-  admission or symptom onset).
-* Before any transformations, all continuous features must be
-  [winsorized](https://en.wikipedia.org/wiki/Winsorizing) by setting the
-  top/bottom 1% of values to the 1st and 99th percentile values. Python code
-  to achieve this can be found in [`cleaning.py`](cleaning.py):
-
-  ```python
-  to_trim = ['crp', 'estimatedgfr', 'neutrophils', 'plt', 'urea', 'nlr', 'oxsat', 'oxlt', 'news2']
-  df[to_trim] = df[to_trim].clip(lower=df[to_trim].quantile(0.01),
-                                 upper=df[to_trim].quantile(0.99),
-                                 axis=1)
-  ```
-
-* Some features (`crp`, `neutrophils`, `nlr`, `urea`) require transformation,
-  as summarised in the table.
-* Oxygen litres (`oxlt`) should be scored as 0 for patients not on supplemental
-  oxygen.
+  admission or symptom onset). Where multiple measures are available, use the
+  first available value post-index date.
+* Oxygen litres (`oxlt`) is the O<sub>2</sub> supplemental flow rate measured
+  in L/min. This should be scored as 0 for patients not on supplemental oxygen.
 * The variable `nosoc` identifies nosocomial patients (i.e. those developing
   COVID infection in hospital). This is used to stratify the models. It should
   be set to 1 for patients developing COVID infection after hospital admission;
