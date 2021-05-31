@@ -212,7 +212,7 @@ disable this section of the script, by setting `True` to `False`.
     ```bash
     git clone https://github.com/ewancarr/NEWS2-COVID-19
     cd NEWS2-COVID-19
-    pip install -r software/requirements.txt
+    pip install -r requirements.txt
     python replicate.py
     ```
 
